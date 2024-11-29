@@ -9,12 +9,11 @@ mod process_object;
 use std::error;
 use std::time::{Duration, Instant};
 use crossterm::event;
-use crossterm::event::{Event, KeyCode, KeyEventKind};
+use crossterm::event::{Event, KeyCode, KeyEventKind, MouseButton, MouseEventKind};
 use crate::app::App;
 use crate::proc_table_component::SortTableParam;
 pub type AppResult<T> = std::result::Result<T, Box<dyn error::Error>>;
 
-// todo - обработка командной строки
 fn main() -> std::io::Result<()> {
 
     let mut terminal = ratatui::init();
@@ -70,23 +69,6 @@ fn handle_events(app: &mut App) -> std::io::Result<bool> {
             // handle other key events
             _ => {}
         },
-        // Event::Mouse(mouse_event) => match mouse_event.kind {
-        //     MouseEventKind::Down(MouseButton::Left) => {
-        //         let selected_column = mouse_event.column;
-        //         match selected_column {
-        //             0 => app.process_table_sort_active_function = app.process_table_sort_by_pid,
-        //             1 => app.process_table_sort_active_function = app.process_table_sort_by_cpu,
-        //             2 => app.process_table_sort_active_function = app.process_table_sort_by_mem,
-        //             3 => app.process_table_sort_active_function = app.process_table_sort_by_time,
-        //             4 => app.process_table_sort_active_function = app.process_table_sort_by_name,
-        //             5 => app.process_table_sort_active_function = app.process_table_sort_by_command,
-        //
-        //             _ => app.process_table_sort_active_function = app.process_table_sort_by_cpu,
-        //         }
-        //     }
-        // // handle other events
-        //     _ => {}
-        // }
         _ => {}
     }
     Ok(false)

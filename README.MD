@@ -10,3 +10,5 @@ Dependencies:
  - chrono = "0.4.38"
  - crossterm = "0.28.1"
  - ratatui = "0.29.0"
+
+![slm image](/assets/slm_0.1.0.png)

@@ -4,6 +4,13 @@ A very simple console application for monitoring system load.
 Written in RUST using the RATATUI framework and a small sysinfo library for obtaining system information.
 
 -----------------------------
+
+Operating systems supported:
+
+    - Linux
+    - MacOS
+
+-----------------------------
 Dependencies:
 
  - sysinfo="0.32.0"

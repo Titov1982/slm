@@ -7,8 +7,8 @@ Written in RUST using the RATATUI framework and a small sysinfo library for obta
 
 Operating systems supported:
 
-    - Linux
-    - MacOS
+  - Linux
+  - MacOS
 
 -----------------------------
 Dependencies:

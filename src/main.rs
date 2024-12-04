@@ -5,20 +5,26 @@ mod proc_table_component;
 mod app;
 mod ui;
 mod process_object;
+mod cli_parser;
 
 use std::error;
 use std::time::{Duration, Instant};
+use clap::Parser;
 use crossterm::event;
-use crossterm::event::{Event, KeyCode, KeyEventKind, MouseButton, MouseEventKind};
+use crossterm::event::{Event, KeyCode, KeyEventKind};
 use crate::app::App;
 use crate::proc_table_component::SortTableParam;
 pub type AppResult<T> = std::result::Result<T, Box<dyn error::Error>>;
 
+use cli_parser::Cli;
+
 fn main() -> std::io::Result<()> {
+
+    let args = Cli::parse();
 
     let mut terminal = ratatui::init();
 
-    let mut app = App::new();
+    let mut app = App::new(args.daemon_on, args.path.display().to_string(), args.tick_rate);
     let result = run(&mut terminal, &mut app);
     ratatui::restore();
 
@@ -27,7 +33,7 @@ fn main() -> std::io::Result<()> {
 
 fn run(terminal: &mut ratatui::DefaultTerminal, app: &mut App) -> std::io::Result<()> {
 
-    let tick_rate = Duration::from_millis(1000);
+    let tick_rate = Duration::from_millis(/*1000*/app.tick_rate);
     let mut last_tick = Instant::now();
 
     loop {

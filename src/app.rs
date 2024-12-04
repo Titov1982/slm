@@ -8,6 +8,8 @@ use crate::process_object::ProcessObject;
 
 
 pub struct App {
+    pub tick_rate: u64,
+
     pub system_state: System,       // System state
     pub system_uptime: String,      // System uptime
 
@@ -56,9 +58,11 @@ pub struct App {
 }
 
 impl App {
-    pub fn new() -> App {
+    pub fn new(daemon_on: bool, csv_data_file_path: String, tick_rate: u64) -> App {
 
         App {
+            tick_rate,
+
             system_state: System::new(),
             system_uptime: String::new(),
 
@@ -75,8 +79,15 @@ impl App {
             cpu_usage_vec: vec![0.0, 0.0, 0.0],
             cpu_usage_human: 0.0,
 
-            cpu_usage_trend_vec: Vec::from([(0.0, System::new().global_cpu_usage() as f64)]),
-            mem_usage_trend_vec: Vec::from([(0.0, System::new().used_memory() as f64)]),
+            cpu_usage_trend_vec: match daemon_on {
+                false => Vec::from([(0.0, System::new().global_cpu_usage() as f64)]),
+                true => App::load_data_from_csv(&csv_data_file_path).0,
+            },
+
+            mem_usage_trend_vec: match daemon_on {
+                false => Vec::from([(0.0, System::new().used_memory() as f64)]),
+                true => App::load_data_from_csv(&csv_data_file_path).1,
+            },
 
             clock: Local::now(),
 
@@ -98,6 +109,24 @@ impl App {
             info_string: "Down/PageDown/Up/PageUp; Sort: 1 - Pid, 2 - User, 3 - Cpu, 4 - Mem, 5 - Time, 6 - Name, 7 - Command; \
             F9 - kill selected process; q / F10 - for quit".to_string(),
         }
+    }
+
+    pub fn load_data_from_csv(csv_data_file_path: &String) -> (Vec::<(f64, f64)>, Vec::<(f64, f64)>) {
+
+        let mut cpu_data = Vec::<(f64, f64)>::new();
+        let mut mem_data = Vec::<(f64, f64)>::new();
+
+        let reader = csv::Reader::from_path(csv_data_file_path);
+        for record in reader.unwrap().records() {
+            let record = record.unwrap();
+            let mem_used_in_bytes =  (&record[2].to_string()).parse::<u64>().unwrap();
+            let mut sysinfo = System::new();
+            sysinfo.refresh_all();
+            let mem_used_per = (mem_used_in_bytes as f64 / sysinfo.total_memory() as f64) * 100.0;
+            cpu_data.push(((&record[0].to_string()).parse::<f64>().unwrap(), (&record[1].to_string()).parse::<f64>().unwrap()));
+            mem_data.push(((&record[0].to_string()).parse::<f64>().unwrap(), mem_used_per));
+        }
+        (cpu_data, mem_data)
     }
 
     pub fn update_state(&mut self) {
